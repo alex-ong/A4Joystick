@@ -23,7 +23,8 @@ const uint8_t NUM_PORTS = 12;
 const uint8_t ports[] = {2,3,4,5,6,7,8,9,10,16,14,15};
 // Last state of the button
 bool buttonStates[12] =  {};
-
+int16_t lastX;
+int16_t lastY;
 void setup() {
   // Initialize Button Pins
   for (int i = 0; i < NUM_PORTS; i++)
@@ -34,7 +35,7 @@ void setup() {
   // Initialize Joystick Library
   Joystick.setXAxisRange(-1, 1);
   Joystick.setYAxisRange(-1, 1);
-  Joystick.begin(false);
+  Joystick.begin(true);
 }
 
 
@@ -52,14 +53,15 @@ int16_t determineAxis(int prevMinus, int prevPlus, bool minusPressed, bool plusP
   //todo. have timestamps, and make the new value override the old value.
 }
 void loop() {
-
+  bool sendMessage = false;
   // Read pin values
   for (int i = BUTTON_1; i <= BUTTON_8; i++)
   {
     bool state = !digitalRead(ports[i]);    
-    //if (state != buttonStates[i]) {
+    if (state != buttonStates[i]) {
       Joystick.setButton(i, state);
-    //}
+      sendMessage = true;
+    }
     buttonStates[i] = state;
   }
 
@@ -69,9 +71,19 @@ void loop() {
   bool up = !digitalRead(ports[UP]);
   bool down = !digitalRead(ports[DOWN]);
   int16_t yAxis = determineAxis(0,0,down, up);
-  Joystick.setXAxis(xAxis);
-  Joystick.setYAxis(yAxis);
+  if (xAxis != lastX) {
+    Joystick.setXAxis(xAxis);
+    sendMessage = true;
+  }
   
+  if (yAxis != lastY) {
+    Joystick.setYAxis(yAxis);
+    sendMessage = true;
+  }
+  lastX = xAxis;
+  lastY = yAxis;
   
-  Joystick.sendState();
+  if (sendMessage) {
+    Joystick.sendState();
+  }
 }
