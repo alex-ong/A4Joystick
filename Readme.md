@@ -5,7 +5,7 @@ Firmware:
 
 1) Download and install joystick library:
 ![](https://github.com/alex-ong/A4Joystick/blob/master/main/arduinojoysticklibrary.png?raw=true)
-I cant remember which version. it's probably 2.0 or master.
+Use version 2.0.
 You copy it into your arduino installation folder somewhere 
 ```
 Installation Instructions
